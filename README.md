@@ -1,3 +1,5 @@
 # Gallery
-相册练习
-框架：Glide
+相册
+·图片集成框架有Glide
+·使用XXPermisson权限请求框架
+·优化加载速度
