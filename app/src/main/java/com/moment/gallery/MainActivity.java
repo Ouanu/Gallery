@@ -1,8 +1,11 @@
 package com.moment.gallery;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.*;
 
 import android.util.Log;
 import android.view.View;
+
 import android.widget.ListView;
 
 import android.widget.TextView;
@@ -15,6 +18,7 @@ import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 import com.moment.gallery.base.ImageAdapter;
+import com.moment.gallery.common.DataHelper;
 import com.moment.gallery.common.ImageHelper;
 
 import java.util.List;
@@ -37,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     ImageHelper imageHelper;
 
+    DataHelper dataHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         checkPermission();
+
+        dataHelper = new DataHelper(imageUrls, folderNames, counts, MainActivity.this);
+        folderNames = dataHelper.getFolderNames();
+        imageUrls = dataHelper.getImageUrls();
+        counts = dataHelper.getCounts();
+        initAdapter();
+
 
     }
 
@@ -65,6 +77,18 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "获取读写权限成功", Toast.LENGTH_SHORT).show();
                             imageHelper = new ImageHelper(fileUrl);
                             imageThread();
+//                            SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+//                            if (sharedPreferences == null) {
+//
+//                            } else {
+//                                dataHelper.ReadSharedPreference();
+//                                imageUrls = dataHelper.getImageUrls();
+//                                folderNames = dataHelper.getFolderNames();
+//                                counts = dataHelper.getCounts();
+//                                initAdapter();
+//                            }
+
+
                         } else {
                             Toast.makeText(MainActivity.this, "获取部分权限成功，但部分权限未正常授予", Toast.LENGTH_SHORT).show();
                         }
@@ -78,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                             XXPermissions.startPermissionActivity(MainActivity.this, permissions);
                         } else {
                             Toast.makeText(MainActivity.this, "获取读写权限", Toast.LENGTH_SHORT).show();
+                            handler.sendEmptyMessage(NONE_PIC);
                         }
                     }
                 });
@@ -95,11 +120,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("imageUrls", imageHelper.getThumbNail().toString());
                 Log.d("folderNames", folderNames.toString());
                 Log.d("counts", counts.toString());
-                if (folderNames.size() <= 0) {
-                    handler.sendEmptyMessage(NONE_PIC);
-                } else {
-                    handler.sendEmptyMessage(PIC_FOR_READY);
-                }
+//                if (folderNames.size() <= 0) {
+//                    handler.sendEmptyMessage(NONE_PIC);
+//                } else {
+//                    handler.sendEmptyMessage(PIC_FOR_READY);
+//                }
+                dataHelper = new DataHelper(imageUrls, folderNames, counts, MainActivity.this);
+                dataHelper.WriteSharedPreferences();
             }
         }).start();
     }
@@ -116,11 +143,16 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case NONE_PIC:
                     progress_circular.setText("没有找到图片，也可能没有获取文件读写权限");
-                    handler.removeMessages(PIC_FOR_READY);
+                    handler.removeMessages(NONE_PIC);
                     break;
             }
         }
     };
+
+    //更新页面
+    private void updateInitAdapter() {
+        handler.sendEmptyMessage(PIC_FOR_READY);
+    }
 
     private void initAdapter() {
         ImageAdapter imageAdapter = new ImageAdapter(this, imageUrls, folderNames, counts);
