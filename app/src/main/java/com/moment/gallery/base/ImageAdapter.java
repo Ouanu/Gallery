@@ -7,7 +7,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.bumptech.glide.Glide;
 import com.moment.gallery.R;
+import com.moment.gallery.common.ImageHelper;
 
 import java.util.List;
 
@@ -50,7 +52,8 @@ public class ImageAdapter extends BaseAdapter {
             viewHolder.textView = convertView.findViewById(R.id.file_name);
             viewHolder.imageView = convertView.findViewById(R.id.iv_photo);
             viewHolder.textView.setText(fileNames.get(position) + "(" + counts.get(position) + ")");
-            viewHolder.imageView.setImageURI(Uri.parse(imageUris.get(position)));
+            Glide.with(mContext).load(imageUris.get(position)).apply(ImageHelper.requestOptions()).into(viewHolder.imageView);
+//            viewHolder.imageView.setImageURI(Uri.parse(imageUris.get(position)));
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();

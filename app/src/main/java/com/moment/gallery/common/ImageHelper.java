@@ -1,21 +1,28 @@
 package com.moment.gallery.common;
 
 import android.util.Log;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
 import java.util.*;
 
 public class ImageHelper {
-    private String fileUri;
-    private static List<Integer> count = new ArrayList<>();
-    private List<String> folderNames = new ArrayList<>();
+    private final String fileUri;
+    private static final List<Integer> count = new ArrayList<>();
+    private final List<String> folderNames = new ArrayList<>();
 
 
     public ImageHelper(String fileUri) {
         this.fileUri = fileUri;
     }
 
-    //获取文件夹里图片的数量
+    /***
+     * 获取文件夹里图片的数量
+     * @return 返回图片数量
+     */
     public List<Integer> getCount() {
         List<Integer> resultCount = new ArrayList<>();
         for (Integer integer : count) {
@@ -26,7 +33,10 @@ public class ImageHelper {
         return resultCount;
     }
 
-    //缩略图
+    /**
+     * 缩略图
+     * @return 返回缩略图路径列表
+     */
     public List<String> getThumbNail() {
         List<String> thumbNails = new ArrayList<>();
         for (String folderName : folderNames) {
@@ -36,7 +46,10 @@ public class ImageHelper {
         return thumbNails;
     }
 
-    //获取文件夹名称
+    /**
+     * 获取文件夹名称
+     * @return 返回文件夹名称列表
+     */
     public List<String> getFolderNames() {
         File[] files = new File(fileUri).listFiles();
         int cnt;
@@ -51,10 +64,15 @@ public class ImageHelper {
                 }
             }
         }
+
         return folderNames;
     }
 
-    //获取图片名称
+    /**
+     * 获取图片名称
+     * @param folderUri
+     * @return 返回图片名称列表
+     */
     public List<String> getImageNames(String folderUri) {
         List<String> imageNames = new ArrayList<>();
         File[] files = new File(folderUri).listFiles();
@@ -67,7 +85,11 @@ public class ImageHelper {
         return imageNames;
     }
 
-    //判断是否为图片
+    /**
+     * 判断是否为图片
+     * @param file
+     * @return 返回判断
+     */
     private boolean isImage(File file) {
         if (file.getName().endsWith(".jpg")) {
             return true;
@@ -84,7 +106,7 @@ public class ImageHelper {
      * 按照文件名排序
      *
      * @param filePath
-     * @return
+     * @return 返回排完序的文件夹列表
      */
     public static ArrayList<String> orderByName(String filePath) {
         ArrayList<String> FileNameList = new ArrayList<String>();
@@ -108,5 +130,24 @@ public class ImageHelper {
         }
         return FileNameList;
     }
+
+    /**
+     * 利用Glide设置圆角图片
+     * @return 返回设置
+     */
+    public static RequestOptions requestOptions() {
+        RoundedCorners roundedCorners = new RoundedCorners(20);//数字为圆角度数
+        RequestOptions coverRequestOptions = new RequestOptions()
+                .transforms(new CenterCrop(), roundedCorners)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
+                .skipMemoryCache(true);//不做内存缓存
+        //Glide 加载图片简单用法
+//        Glide.with(context).load(path).apply(coverRequestOptions).into(imageView);
+        return coverRequestOptions;
+    }
+
+
+
+
 
 }

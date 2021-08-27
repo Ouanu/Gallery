@@ -26,7 +26,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="10dp"
                 android:dividerHeight="8dp"
-                android:divider="@color/white"/>
+                android:divider="@color/null_color"/>
 
         <TextView
                 android:id="@+id/progress_circular"
