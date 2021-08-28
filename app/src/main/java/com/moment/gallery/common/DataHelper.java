@@ -15,7 +15,8 @@ public class DataHelper {
     private List<String> folderNames;
     private List<Integer> counts;
     private Context mContext;
-    private int cnt;
+    public int cnt;
+
 
     public DataHelper(List<String> imageUrls, List<String> folderNames, List<Integer> counts, Context mContext) {
         this.imageUrls = imageUrls;
@@ -37,19 +38,6 @@ public class DataHelper {
         editor.commit();
     }
 
-//    public void ReadSharedPreference() {
-//        SharedPreferences sharedPreferences = mContext.getSharedPreferences("data", MODE_PRIVATE);
-//        int i = 0;
-//        for (; i < sharedPreferences.getInt("Nums", 0); i++) {
-//            imageUrls.set(i, sharedPreferences.getString("imageUrls" + i, ""));
-//            folderNames.set(i, sharedPreferences.getString("folderNames" + i, ""));
-//            counts.set(i, sharedPreferences.getInt("counts" + i, 0));
-//        }
-//        Log.d("dataHelper.getFolderNames()", getFolderNames().toString());
-//        Log.d("dataHelper.getImageUrls()", getImageUrls().toString());
-//        Log.d("dataHelper.getCounts()", getCounts().toString());
-//    }
-
     public List<String> getImageUrls() {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences("data", MODE_PRIVATE);
         List<String> mImageUrls = new ArrayList<>();
@@ -66,6 +54,7 @@ public class DataHelper {
 
     public List<String> getFolderNames() {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences("data", MODE_PRIVATE);
+
         List<String> mFolderNames = new ArrayList<>();
         cnt = sharedPreferences.getInt("Nums", 0);
         for (int i = 0; i < cnt; i++) {

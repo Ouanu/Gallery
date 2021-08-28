@@ -1,11 +1,13 @@
 package com.moment.gallery;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.*;
 
 import android.util.Log;
 import android.view.View;
 
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import android.widget.TextView;
@@ -21,6 +23,8 @@ import com.moment.gallery.base.ImageAdapter;
 import com.moment.gallery.common.DataHelper;
 import com.moment.gallery.common.ImageHelper;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static android.os.Environment.getExternalStorageDirectory;
@@ -56,14 +60,38 @@ public class MainActivity extends AppCompatActivity {
 
         checkPermission();
 
-        dataHelper = new DataHelper(imageUrls, folderNames, counts, MainActivity.this);
-        folderNames = dataHelper.getFolderNames();
-        imageUrls = dataHelper.getImageUrls();
-        counts = dataHelper.getCounts();
-        initAdapter();
+        /**
+         * 检查本地是否有上次打开存储的记录
+         * 若有，则直接构建；否或无图片资源，则等待；
+         */
+        SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+        if (sharedPreferences.getInt("Nums", 0) != 0) {
+            dataHelper = new DataHelper(imageUrls, folderNames, counts, MainActivity.this);
+            folderNames = dataHelper.getFolderNames();
+            imageUrls = dataHelper.getImageUrls();
+            counts = dataHelper.getCounts();
+            initAdapter();
 
+        }
+
+        /**
+         * 点击列表的元素，携带该文件夹所有的图片、文件名进到下一个页面
+         */
+        mLvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String Path = fileUrl + "/" + folderNames.get(position);
+                ArrayList<String> images = (ArrayList<String>) imageHelper.getImageNames(Path);
+                Intent intent = new Intent(MainActivity.this, FileActivity.class);
+                intent.putStringArrayListExtra("images", images);
+                intent.putExtra("folderUri", fileUrl + "/" + folderNames.get(position));
+                intent.putExtra("fileName", folderNames.get(position));
+                startActivity(intent);
+            }
+        });
 
     }
+
 
     //检查权限
     private void checkPermission() {
@@ -77,18 +105,6 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "获取读写权限成功", Toast.LENGTH_SHORT).show();
                             imageHelper = new ImageHelper(fileUrl);
                             imageThread();
-//                            SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
-//                            if (sharedPreferences == null) {
-//
-//                            } else {
-//                                dataHelper.ReadSharedPreference();
-//                                imageUrls = dataHelper.getImageUrls();
-//                                folderNames = dataHelper.getFolderNames();
-//                                counts = dataHelper.getCounts();
-//                                initAdapter();
-//                            }
-
-
                         } else {
                             Toast.makeText(MainActivity.this, "获取部分权限成功，但部分权限未正常授予", Toast.LENGTH_SHORT).show();
                         }
@@ -117,14 +133,11 @@ public class MainActivity extends AppCompatActivity {
                 folderNames = imageHelper.getFolderNames();
                 imageUrls = imageHelper.getThumbNail();
                 counts = imageHelper.getCount();
-                Log.d("imageUrls", imageHelper.getThumbNail().toString());
-                Log.d("folderNames", folderNames.toString());
-                Log.d("counts", counts.toString());
-//                if (folderNames.size() <= 0) {
-//                    handler.sendEmptyMessage(NONE_PIC);
-//                } else {
-//                    handler.sendEmptyMessage(PIC_FOR_READY);
-//                }
+                if (folderNames.size() <= 0) {
+                    handler.sendEmptyMessage(NONE_PIC);
+                } else {
+                    handler.sendEmptyMessage(PIC_FOR_READY);
+                }
                 dataHelper = new DataHelper(imageUrls, folderNames, counts, MainActivity.this);
                 dataHelper.WriteSharedPreferences();
             }

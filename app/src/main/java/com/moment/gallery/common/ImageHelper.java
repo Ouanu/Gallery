@@ -103,35 +103,6 @@ public class ImageHelper {
     }
 
     /**
-     * 按照文件名排序
-     *
-     * @param filePath
-     * @return 返回排完序的文件夹列表
-     */
-    public static ArrayList<String> orderByName(String filePath) {
-        ArrayList<String> FileNameList = new ArrayList<String>();
-        File file = new File(filePath);
-        File[] files = file.listFiles();
-        List fileList = Arrays.asList(files);
-        Collections.sort(fileList, new Comparator<File>() {
-            @Override
-            public int compare(File o1, File o2) {
-                if (o1.isDirectory() && o2.isFile())
-                    return -1;
-                if (o1.isFile() && o2.isDirectory())
-                    return 1;
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
-        for (File file1 : files) {
-            if (file1.isDirectory()) {
-                FileNameList.add(file1.getName());
-            }
-        }
-        return FileNameList;
-    }
-
-    /**
      * 利用Glide设置圆角图片
      * @return 返回设置
      */
@@ -145,9 +116,6 @@ public class ImageHelper {
 //        Glide.with(context).load(path).apply(coverRequestOptions).into(imageView);
         return coverRequestOptions;
     }
-
-
-
 
 
 }
