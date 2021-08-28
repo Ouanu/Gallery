@@ -35,24 +35,50 @@ public class ImageHelper {
 
     /**
      * 缩略图
+     *
      * @return 返回缩略图路径列表
      */
     public List<String> getThumbNail() {
         List<String> thumbNails = new ArrayList<>();
         for (String folderName : folderNames) {
-            thumbNails.add(fileUri + "/" + folderName + "/" + getImageNames(fileUri + "/" + folderName).get(0));
+            if (folderName.equals("")) {
+                thumbNails.add(fileUri + "/" + getImageNames(fileUri).get(0));
+            } else {
+                thumbNails.add(fileUri + "/" + folderName + "/" + getImageNames(fileUri + "/" + folderName).get(0));
+            }
         }
         Log.d("thumbNails", thumbNails.toString());
         return thumbNails;
     }
 
     /**
+     * 扫描DCIM目录下所有文件及第一层文件夹
+     * @return 返回有图片的文件夹名称列表
+     */
+    public List<String> getScanFolder() {
+        List<String> allFolderNames = new ArrayList<>();
+        int Count = 0;
+        Count = getImageNames(fileUri).size();
+        if (Count > 0) {
+            allFolderNames.add("");
+        }
+        getFolderNames();
+        folderNames.addAll(allFolderNames);
+//        allFolderNames.addAll(getFolderNames());
+        count.add(Count);
+
+        return folderNames;
+    }
+
+    /**
      * 获取文件夹名称
+     *
      * @return 返回文件夹名称列表
      */
     public List<String> getFolderNames() {
         File[] files = new File(fileUri).listFiles();
         int cnt;
+        int dcimCount = 0;
         for (File file : files) {
             String path = fileUri + "/" + file.getName();
             if (file.getName().startsWith(".") || isImage(file)) {
@@ -64,12 +90,13 @@ public class ImageHelper {
                 }
             }
         }
-
         return folderNames;
     }
 
+
     /**
      * 获取图片名称
+     *
      * @param folderUri
      * @return 返回图片名称列表
      */
@@ -87,6 +114,7 @@ public class ImageHelper {
 
     /**
      * 判断是否为图片
+     *
      * @param file
      * @return 返回判断
      */
@@ -104,6 +132,7 @@ public class ImageHelper {
 
     /**
      * 利用Glide设置圆角图片
+     *
      * @return 返回设置
      */
     public static RequestOptions requestOptions() {

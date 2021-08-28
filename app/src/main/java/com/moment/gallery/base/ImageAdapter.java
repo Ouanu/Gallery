@@ -51,18 +51,26 @@ public class ImageAdapter extends BaseAdapter {
             convertView = View.inflate(mContext, R.layout.file_item, null);
             viewHolder.textView = convertView.findViewById(R.id.file_name);
             viewHolder.imageView = convertView.findViewById(R.id.iv_photo);
-            viewHolder.textView.setText(fileNames.get(position) + "(" + counts.get(position) + ")");
-            Glide.with(mContext).load(imageUris.get(position)).apply(ImageHelper.requestOptions()).into(viewHolder.imageView);
-//            viewHolder.imageView.setImageURI(Uri.parse(imageUris.get(position)));
+            //            viewHolder.imageView.setImageURI(Uri.parse(imageUris.get(position)));
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+        viewHolder.textView.setText(getName(fileNames.get(position)) + "(" + counts.get(position) + ")");
+        Glide.with(mContext).load(imageUris.get(position)).apply(ImageHelper.requestOptions()).into(viewHolder.imageView);
+
         return convertView;
     }
 
     private class ViewHolder {
         TextView textView;
         ImageView imageView;
+    }
+
+    private String getName(String name){
+        if (name.equals("")) {
+            return "DCIM";
+        }
+        return name;
     }
 }

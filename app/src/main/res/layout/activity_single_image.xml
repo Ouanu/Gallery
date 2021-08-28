@@ -17,7 +17,7 @@
             android:layout_marginTop="30dp"
             android:layout_centerInParent="true"
             android:layout_alignParentTop="true"
-            android:gravity="left|center"
+            android:gravity="center"
             android:visibility="visible"
             android:singleLine="true"
             android:paddingHorizontal="10dp"

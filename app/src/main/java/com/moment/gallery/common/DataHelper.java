@@ -3,6 +3,7 @@ package com.moment.gallery.common;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import com.moment.gallery.Utils.Utils;
 
 
 import java.util.ArrayList;
@@ -15,8 +16,14 @@ public class DataHelper {
     private List<String> folderNames;
     private List<Integer> counts;
     private Context mContext;
+    private String md5;
     public int cnt;
 
+    public String getMd5() {
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences("data", MODE_PRIVATE);
+        md5 = sharedPreferences.getString("md5", "0");
+        return md5;
+    }
 
     public DataHelper(List<String> imageUrls, List<String> folderNames, List<Integer> counts, Context mContext) {
         this.imageUrls = imageUrls;
@@ -34,6 +41,7 @@ public class DataHelper {
             editor.putInt("counts" + i, counts.get(i));
             i++;
         }
+        editor.putString("md5", Utils.md5(counts.toString()));
         editor.putInt("Nums", i);
         editor.commit();
     }

@@ -1,5 +1,6 @@
 package com.moment.gallery;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,7 +53,12 @@ public class FileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
 
-
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        setResult(Activity.RESULT_OK);
+        finish();
     }
 }

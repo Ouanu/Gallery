@@ -46,17 +46,17 @@ public class ImagesInFileAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
         Log.d("IFAdapter", String.valueOf(images.size()));
-//        if (convertView == null) {
+        if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = View.inflate(mContext, R.layout.images_in_file_item, null);
             viewHolder.imageView = convertView.findViewById(R.id.iv_image);
             viewHolder.linearLayout = convertView.findViewById(R.id.ll_item);
-            Glide.with(convertView).load(path + "/" + images.get(position)).into(viewHolder.imageView);
 //            viewHolder.imageView.setImageURI(Uri.parse(path + "/" + images.get(position)));
             convertView.setTag(viewHolder);
-//        } else {
+        } else {
             viewHolder = (ViewHolder) convertView.getTag();
-//        }
+        }
+        Glide.with(convertView).load(path + "/" + images.get(position)).into(viewHolder.imageView);
         return convertView;
     }
 

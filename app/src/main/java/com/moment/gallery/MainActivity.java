@@ -13,12 +13,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
+import com.moment.gallery.Utils.Utils;
 import com.moment.gallery.base.ImageAdapter;
 import com.moment.gallery.common.DataHelper;
 import com.moment.gallery.common.ImageHelper;
@@ -34,11 +36,14 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PIC_FOR_READY = 1;
     private static final int NONE_PIC = 2;
+    private static final int REQUEST_FILE = 1000;
+    private static final int PIC_FOR_UPDATE = 3;
     private TextView progress_circular;
     private ListView mLvItems;
     private List<String> imageUrls;
     private List<String> folderNames;
     private List<Integer> counts;
+    private String mMd5;
     private final String fileUrl = getExternalStorageDirectory().getAbsolutePath() + "/DCIM";
 
     private boolean isChecked = false;
@@ -70,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
             folderNames = dataHelper.getFolderNames();
             imageUrls = dataHelper.getImageUrls();
             counts = dataHelper.getCounts();
+            mMd5 = dataHelper.getMd5();
             initAdapter();
 
         }
@@ -86,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
                 intent.putStringArrayListExtra("images", images);
                 intent.putExtra("folderUri", fileUrl + "/" + folderNames.get(position));
                 intent.putExtra("fileName", folderNames.get(position));
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_FILE);
+//                startActivity(intent);
             }
         });
 
@@ -125,19 +132,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     //创建线程
     private void imageThread() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                folderNames = imageHelper.getFolderNames();
+//                folderNames = imageHelper.getFolderNames();
+                folderNames = imageHelper.getScanFolder();
                 imageUrls = imageHelper.getThumbNail();
                 counts = imageHelper.getCount();
+                String md5 = Utils.md5(counts.toString());
                 if (folderNames.size() <= 0) {
                     handler.sendEmptyMessage(NONE_PIC);
                 } else {
-                    handler.sendEmptyMessage(PIC_FOR_READY);
+                    if (!md5.equals(mMd5)) {
+                        handler.sendEmptyMessage(PIC_FOR_READY);
+                    }
                 }
+//                Log.d("yeor", "run: "+ (counts.retainAll(dataHelper.getCounts())));
                 dataHelper = new DataHelper(imageUrls, folderNames, counts, MainActivity.this);
                 dataHelper.WriteSharedPreferences();
             }
@@ -158,14 +171,14 @@ public class MainActivity extends AppCompatActivity {
                     progress_circular.setText("没有找到图片，也可能没有获取文件读写权限");
                     handler.removeMessages(NONE_PIC);
                     break;
+                case PIC_FOR_UPDATE:
+                    initAdapter();
+                    break;
             }
         }
     };
 
-    //更新页面
-    private void updateInitAdapter() {
-        handler.sendEmptyMessage(PIC_FOR_READY);
-    }
+
 
     private void initAdapter() {
         ImageAdapter imageAdapter = new ImageAdapter(this, imageUrls, folderNames, counts);
@@ -173,5 +186,12 @@ public class MainActivity extends AppCompatActivity {
         progress_circular.setVisibility(View.GONE);
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_FILE) {
+            Log.d("onActivityResult", "onActivityResult: 1000");
+//            imageThread();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }
