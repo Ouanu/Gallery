@@ -1,5 +1,6 @@
 package com.moment.gallery;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +20,7 @@ public class FileActivity extends AppCompatActivity {
 
     private ArrayList<String> images = new ArrayList<>();
     private String folderUri;
+    private String fileUri;
     ImagesInFileAdapter imagesInFileAdapter;
 
 
@@ -33,7 +35,9 @@ public class FileActivity extends AppCompatActivity {
         mFileName.setText(getIntent().getStringExtra("fileName"));
         images = getIntent().getStringArrayListExtra("images");
         folderUri = getIntent().getStringExtra("folderUri");
+
         Log.d("FileActivity", images.toString());
+        Log.d("FileActivity", folderUri.toString());
 
         imagesInFileAdapter = new ImagesInFileAdapter(this, images, folderUri);
         mGvImages.setAdapter(imagesInFileAdapter);
@@ -41,7 +45,11 @@ public class FileActivity extends AppCompatActivity {
         mGvImages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                Intent intent = new Intent(FileActivity.this, SingleImageActivity.class);
+                intent.putStringArrayListExtra("images", images);
+                intent.putExtra("singleImage", images.get(position));
+                intent.putExtra("folderUri", folderUri);
+                startActivity(intent);
             }
         });
 

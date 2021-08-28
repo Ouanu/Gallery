@@ -21,6 +21,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".FileActivity"/>
+        <activity android:name=".SingleImageActivity"
+                android:theme="@style/Theme.Gallery.SingleImage"/>
     </application>
 
 </manifest>
