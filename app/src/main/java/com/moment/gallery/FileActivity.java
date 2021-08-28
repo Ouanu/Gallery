@@ -33,7 +33,7 @@ public class FileActivity extends AppCompatActivity {
         mFileName = findViewById(R.id.file_name);
         mGvImages = findViewById(R.id.gv_images);
 
-        mFileName.setText(getIntent().getStringExtra("fileName"));
+        mFileName.setText(reName(getIntent().getStringExtra("fileName")));
         images = getIntent().getStringArrayListExtra("images");
         folderUri = getIntent().getStringExtra("folderUri");
 
@@ -60,5 +60,12 @@ public class FileActivity extends AppCompatActivity {
 //        super.onBackPressed();
         setResult(Activity.RESULT_OK);
         finish();
+    }
+
+    private String reName(String name) {
+        if (name.equals("")){
+            return "DCIM";
+        }
+        return name;
     }
 }

@@ -1,5 +1,8 @@
 package com.moment.gallery;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.*;
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int NONE_PIC = 2;
     private static final int REQUEST_FILE = 1000;
     private static final int PIC_FOR_UPDATE = 3;
+    private static final int DELETE_FILE = 4;
     private TextView progress_circular;
     private ListView mLvItems;
     private List<String> imageUrls;
@@ -47,10 +51,13 @@ public class MainActivity extends AppCompatActivity {
     private final String fileUrl = getExternalStorageDirectory().getAbsolutePath() + "/DCIM";
 
     private boolean isChecked = false;
+    private AlertDialog alertDialog;
+    private String delFileName;
 
     ImageHelper imageHelper;
 
     DataHelper dataHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
 
         progress_circular = findViewById(R.id.progress_circular);
         mLvItems = findViewById(R.id.lv_items);
-
 
         checkPermission();
 
@@ -96,9 +102,53 @@ public class MainActivity extends AppCompatActivity {
 //                startActivity(intent);
             }
         });
+        mLvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                showListDialog(position);
+                return true;
+            }
+        });
 
     }
 
+    /**
+     * 长按事件控件
+     * @param position
+     */
+    private void showListDialog(int position){
+        final String listItems[] = new String[]{"删除"};
+
+        AlertDialog.Builder listDialog = new AlertDialog.Builder(this);
+        listDialog.setTitle("test");
+        listDialog.setIcon(R.mipmap.ic_launcher_round);
+
+    /*
+        设置item 不能用setMessage()
+        用setItems
+        items : listItems[] -> 列表项数组
+        listener -> 回调接口
+    */
+        listDialog.setItems(listItems,new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(MainActivity.this,listItems[which],Toast.LENGTH_SHORT).show();
+                handler.sendEmptyMessage(DELETE_FILE);
+                delFileName = fileUrl + "/" + folderNames.get(position);
+            }
+        });
+
+        //设置按钮
+        listDialog.setPositiveButton("确定"
+                , new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        listDialog.create().show();
+    }
 
     //检查权限
     private void checkPermission() {
@@ -174,6 +224,13 @@ public class MainActivity extends AppCompatActivity {
                 case PIC_FOR_UPDATE:
                     initAdapter();
                     break;
+                case DELETE_FILE:
+                    Log.d("Handler", "handleMessage: delete");
+                    Log.d("Handler", delFileName);
+//                    imageHelper.delFile(delFileName);
+//                    imageThread();
+
+                    break;
             }
         }
     };
@@ -190,7 +247,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_FILE) {
             Log.d("onActivityResult", "onActivityResult: 1000");
-//            imageThread();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

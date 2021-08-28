@@ -146,5 +146,13 @@ public class ImageHelper {
         return coverRequestOptions;
     }
 
+    /**
+     * 删除文件
+     * @param fileUri
+     */
+    public void delFile(String fileUri) {
+        File file = new File(fileUri);
+        file.delete();
+    }
 
 }
