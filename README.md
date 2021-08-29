@@ -1,21 +1,27 @@
 # Gallery
-相册
+模块：
 
-图片集成框架有Glide
+common:
 
-使用XXPermisson权限请求框架
+1. DataHelper 保存前一次扫描文件的信息，以便下次快速打开
+2. ImageHelper 扫描DCIM文件夹、获取文件夹及照片的路径和名称
 
-优化加载速度
+utils：
 
-8.28待完成：
+* 生成MD5的工具
 
-·DCIM全扫描；
+base：（适配器）
 
-·优化加载速度；
+1. ImageAdapter 首页item的格式
 
-·添加手势缩放等操作；
+2. SingleImageAdapter 次要页面及展示页面的格式
 
-·图片详情信息；
+Activity:
 
-·图片增删更新。
+1. MainActivity首页
+
+2. FileActivity 首页item所指向的页面
+
+3. SingleImageActivity 次页item指向的单张图片展示
+
 
