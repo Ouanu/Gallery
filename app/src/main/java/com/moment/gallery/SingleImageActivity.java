@@ -20,9 +20,9 @@ import java.util.ArrayList;
 
 public class SingleImageActivity extends AppCompatActivity {
     private static final int TITLE_BAR = 1;
-    private static final int STOP = 2;
-    private static final int COUNT_TIME = 3;
     private static final String TAG = "SingleImage";
+    private static final int SHOW_BAR = 2;
+    private static final int HIDE_BAR = 3;
     private ArrayList<String> images = new ArrayList<>();
     private String folderUri;
     private String singleImage;
@@ -73,10 +73,73 @@ public class SingleImageActivity extends AppCompatActivity {
         mIvSingleImage.setImageURI(Uri.parse(folderUri + "/" + singleImage));
         mTvTitle.setText(singleImage);
 
+        handler.sendEmptyMessageDelayed(TITLE_BAR, 5000);
+
+        zoomImage();
+
+    }
+
+
+
+    private PointF getMidPoint(MotionEvent event) {
+        float x = (event.getX(0) + event.getX(1)) / 2;
+        float y = (event.getY(0) + event.getY(1)) / 2;
+
+        return new PointF(x, y);
+    }
+
+    private float getDistance(MotionEvent event) {
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
+
+        return (float) Math.sqrt(x * x + y * y);
+    }
+
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case TITLE_BAR:
+                    if (isShow) {
+                        HideTitle();
+                        isShow = false;
+                    } else {
+                        ShowTitle();
+                        isShow = true;
+                    }
+                    removeMessages(TITLE_BAR);
+                    break;
+                case SHOW_BAR:
+                    ShowTitle();
+                    removeMessages(HIDE_BAR);
+                    removeMessages(SHOW_BAR);
+                    sendEmptyMessageDelayed(HIDE_BAR, 3000);
+                    break;
+                case HIDE_BAR:
+                    HideTitle();
+                    removeMessages(HIDE_BAR);
+                    break;
+            }
+        }
+    };
+
+    private void ShowTitle() {
+        mTvTitle.setVisibility(View.VISIBLE);
+        isShow = true;
+    }
+
+    private void HideTitle() {
+        mTvTitle.setVisibility(View.GONE);
+        isShow = false;
+    }
+
+    private void zoomImage() {
         mIvSingleImage.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 ImageView view = (ImageView) v;
+                mTvTitle.setVisibility(View.VISIBLE);
                 view.setScaleType(ImageView.ScaleType.MATRIX);
                 final int x = (int) event.getRawX();
                 final int y = (int) event.getRawY();
@@ -127,57 +190,11 @@ public class SingleImageActivity extends AppCompatActivity {
 
                 }
                 view.setImageMatrix(matrix);
+                handler.sendEmptyMessage(SHOW_BAR);
                 return true;
             }
 
         });
-    }
-
-
-
-    private PointF getMidPoint(MotionEvent event) {
-        float x = (event.getX(0) + event.getX(1)) / 2;
-        float y = (event.getY(0) + event.getY(1)) / 2;
-
-        return new PointF(x, y);
-    }
-
-    private float getDistance(MotionEvent event) {
-        float x = event.getX(0) - event.getX(1);
-        float y = event.getY(0) - event.getY(1);
-
-        return (float) Math.sqrt(x * x + y * y);
-    }
-
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case TITLE_BAR:
-                    if (isShow) {
-                        HideTitle();
-                    } else {
-                        ShowTitle();
-                    }
-                    removeMessages(TITLE_BAR);
-                    break;
-            }
-        }
-    };
-
-    private void ShowTitle() {
-        mTvTitle.setVisibility(View.VISIBLE);
-        isShow = true;
-    }
-
-    private void HideTitle() {
-        mTvTitle.setVisibility(View.GONE);
-        isShow = false;
-    }
-
-    private void zoomImage() {
-
     }
 
 }
