@@ -1,12 +1,12 @@
 package com.moment.gallery;
+
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
+
+import android.content.*;
+
 import android.os.*;
 
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 
@@ -23,13 +23,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
-import com.moment.gallery.Utils.Utils;
+
 import com.moment.gallery.base.ImageAdapter;
 import com.moment.gallery.common.DataHelper;
+import com.moment.gallery.common.GalleryHelper;
+
 import com.moment.gallery.common.ImageHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
 
 import static android.os.Environment.getExternalStorageDirectory;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_FILE = 1000;
     private static final int PIC_FOR_UPDATE = 3;
     private static final int DELETE_FILE = 4;
+    private static final String TAG = "MainActivity";
     private TextView progress_circular;
     private ListView mLvItems;
     private List<String> imageUrls;
@@ -54,10 +57,13 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog alertDialog;
     private String delFileName;
 
+    private List<GalleryHelper.ImageFile> images = new ArrayList<>();
+
     ImageHelper imageHelper;
 
     DataHelper dataHelper;
 
+    GalleryHelper galleryHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
         mLvItems = findViewById(R.id.lv_items);
 
         checkPermission();
+
+
+        Log.d(TAG, "onCreate: " + MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
         /**
          * 检查本地是否有上次打开存储的记录
@@ -114,9 +123,10 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 长按事件控件
+     *
      * @param position
      */
-    private void showListDialog(int position){
+    private void showListDialog(int position) {
         final String listItems[] = new String[]{"删除"};
 
         AlertDialog.Builder listDialog = new AlertDialog.Builder(this);
@@ -129,10 +139,10 @@ public class MainActivity extends AppCompatActivity {
         items : listItems[] -> 列表项数组
         listener -> 回调接口
     */
-        listDialog.setItems(listItems,new DialogInterface.OnClickListener() {
+        listDialog.setItems(listItems, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MainActivity.this,listItems[which],Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, listItems[which], Toast.LENGTH_SHORT).show();
                 handler.sendEmptyMessage(DELETE_FILE);
                 delFileName = fileUrl + "/" + folderNames.get(position);
             }
@@ -160,7 +170,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onGranted(List<String> permissions, boolean all) {
                         if (all) {
                             Toast.makeText(MainActivity.this, "获取读写权限成功", Toast.LENGTH_SHORT).show();
-                            imageHelper = new ImageHelper(fileUrl);
+//                            imageHelper = new ImageHelper(fileUrl);
+                            galleryHelper = GalleryHelper.getInstance(MainActivity.this);
                             imageThread();
                         } else {
                             Toast.makeText(MainActivity.this, "获取部分权限成功，但部分权限未正常授予", Toast.LENGTH_SHORT).show();
@@ -188,21 +199,30 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                galleryHelper.getImageList();
+                galleryHelper.getImageInFileList();
+                images = galleryHelper.getImageFileList();
+                counts = galleryHelper.getCountList();
+                Log.d(TAG, "run: " + images);
+                Log.d(TAG, "run: " + counts);
+                Log.d(TAG, "run: " + images.get(3).getFileName());
+                Log.d(TAG, "run: " + images.get(3).getUri());
+                handler.sendEmptyMessage(PIC_FOR_READY);
 //                folderNames = imageHelper.getFolderNames();
-                folderNames = imageHelper.getScanFolder();
-                imageUrls = imageHelper.getThumbNail();
-                counts = imageHelper.getCount();
-                String md5 = Utils.md5(counts.toString());
-                if (folderNames.size() <= 0) {
-                    handler.sendEmptyMessage(NONE_PIC);
-                } else {
-                    if (!md5.equals(mMd5)) {
-                        handler.sendEmptyMessage(PIC_FOR_READY);
-                    }
-                }
+//                folderNames = imageHelper.getScanFolder();
+//                imageUrls = imageHelper.getThumbNail();
+//                counts = imageHelper.getCount();
+//                String md5 = Utils.md5(counts.toString());
+//                if (folderNames.size() <= 0) {
+//                    handler.sendEmptyMessage(NONE_PIC);
+//                } else {
+//                    if (!md5.equals(mMd5)) {
+//                        handler.sendEmptyMessage(PIC_FOR_READY);
+//                    }
+//                }
 //                Log.d("yeor", "run: "+ (counts.retainAll(dataHelper.getCounts())));
-                dataHelper = new DataHelper(imageUrls, folderNames, counts, MainActivity.this);
-                dataHelper.WriteSharedPreferences();
+//                dataHelper = new DataHelper(imageUrls, folderNames, counts, MainActivity.this);
+//                dataHelper.WriteSharedPreferences();
             }
         }).start();
     }
@@ -236,9 +256,9 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-
     private void initAdapter() {
-        ImageAdapter imageAdapter = new ImageAdapter(this, imageUrls, folderNames, counts);
+//        ImageAdapter imageAdapter = new ImageAdapter(this, imageUrls, folderNames, counts);
+        ImageAdapter imageAdapter = new ImageAdapter(this, images, counts);
         mLvItems.setAdapter(imageAdapter);
         progress_circular.setVisibility(View.GONE);
     }

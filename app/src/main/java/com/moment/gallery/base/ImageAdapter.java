@@ -2,6 +2,7 @@ package com.moment.gallery.base;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.moment.gallery.R;
+import com.moment.gallery.common.GalleryHelper;
 import com.moment.gallery.common.ImageHelper;
 
 import java.util.List;
@@ -17,20 +19,18 @@ import static android.os.Environment.getExternalStorageDirectory;
 
 public class ImageAdapter extends BaseAdapter {
     private final Context mContext;
-    private final List<String> imageUris;
-    private final List<String> fileNames;
+    private final List<GalleryHelper.ImageFile> imagefolders;
     private final List<Integer> counts;
 
-    public ImageAdapter(Context mContext, List<String> imageUris, List<String> fileNames, List<Integer> counts) {
+    public ImageAdapter(Context mContext, List<GalleryHelper.ImageFile> imagefolders, List<Integer> counts) {
         this.mContext = mContext;
-        this.imageUris = imageUris;
-        this.fileNames = fileNames;
+        this.imagefolders = imagefolders;
         this.counts = counts;
     }
 
     @Override
     public int getCount() {
-        return fileNames.size();
+        return imagefolders.size();
     }
 
     @Override
@@ -56,8 +56,12 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.textView.setText(getName(fileNames.get(position)) + "(" + counts.get(position) + ")");
-        Glide.with(mContext).load(imageUris.get(position)).apply(ImageHelper.requestOptions()).into(viewHolder.imageView);
+//        viewHolder.textView.setText(getName(fileNames.get(position)) + "(" + counts.get(position) + ")");
+        viewHolder.textView.setText(imagefolders.get(position).getFileName() + "(" + counts.get(position) + ")");
+//        Log.d("Adapter", "getView: "+imagefolders.get(position).getFileName() + "(" + counts.get(position) + ")");
+//        Glide.with(mContext).load(imageUris.get(position)).apply(ImageHelper.requestOptions()).into(viewHolder.imageView);
+        Glide.with(mContext).load(imagefolders.get(position).getUri()).into(viewHolder.imageView);
+
 
         return convertView;
     }
@@ -67,10 +71,10 @@ public class ImageAdapter extends BaseAdapter {
         ImageView imageView;
     }
 
-    private String getName(String name){
-        if (name.equals("")) {
-            return "DCIM";
-        }
-        return name;
-    }
+//    private String getName(String name){
+//        if (name.equals("")) {
+//            return "DCIM";
+//        }
+//        return name;
+//    }
 }
