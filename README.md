@@ -6,7 +6,6 @@ common:
 * DataHelper 保存前一次扫描文件的信息，以便下次快速打开
 * ImageHelper 扫描DCIM文件夹、获取文件夹及照片的路径和名称 
 
-（已知BUG：MIUI没法用，测试机型有小米8SE、一加7T）
 
 utils：
 
