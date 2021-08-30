@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 
 
-
 public class GalleryHelper {
 
     private static final String TAG = "GalleryHelper";
@@ -55,6 +54,8 @@ public class GalleryHelper {
             MediaStore.Images.Media.DATE_MODIFIED
     };
 
+    String selection = MediaStore.Images.Media.SIZE + " >= 81920";
+
     String sortOrder = MediaStore.Images.Media.DATE_MODIFIED + " ASC";
 
 
@@ -66,7 +67,7 @@ public class GalleryHelper {
         try (Cursor cursor = context.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
-                null,
+                selection,
                 null,
                 sortOrder
         )) {
@@ -90,14 +91,16 @@ public class GalleryHelper {
             }
 
             for (Image image : imageList) {
-                Integer cnt = countBucketNames.get(image.getBucketName());
-                countBucketNames.put(image.bucketName, (cnt == null) ? 1 : cnt + 1);
+                if (!"".equals(image.bucketName) && image.bucketName != null) {
+                    Integer cnt = countBucketNames.get(image.getBucketName());
+                    countBucketNames.put(image.bucketName, (cnt == null) ? 1 : cnt + 1);
+                }
             }
+
+            Log.d(TAG, "------------- " + countBucketNames.keySet());
+            Log.d(TAG, "------------- " + countBucketNames.values());
         }
-        Log.d(TAG, "getImageList: ------success--------------");
     }
-
-
 
     /**
      * ImageFileList --> 文件夹名称 + 图片Uri(首页）
@@ -108,7 +111,7 @@ public class GalleryHelper {
         int i = 0;
         int cnt = 0;
         for (String s : countBucketNames.keySet()) {
-            if (s != null) {
+            if (s != null && s.length() > 0) {
                 for (Image image : imageList) {
                     if (s.equals(image.getBucketName())) {
                         imageName.add(image.getImageName());
@@ -118,11 +121,12 @@ public class GalleryHelper {
                     }
                 }
             }
+
             countList.add(cnt);
             cnt = 0;
-            imageFileList.add(new ImageFile(s, imageId.get(i-1)));
+            imageFileList.add(new ImageFile(s, imageId.get(i - 1)));
+
         }
-        Log.d(TAG, "getImageInFileList:----success--------- ");
     }
 
     /**
@@ -131,8 +135,10 @@ public class GalleryHelper {
     public List<Image> getImageInFolder(String folderName) {
         List<Image> images = new ArrayList<>();
         for (Image image : imageList) {
-            if (image.bucketName.equals(folderName)) {
-                images.add(image);
+            if (image != null) {
+                if (folderName.equals(image.bucketName)) {
+                    images.add(image);
+                }
             }
         }
         return images;

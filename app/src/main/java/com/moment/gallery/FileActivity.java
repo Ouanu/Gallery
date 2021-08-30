@@ -3,7 +3,6 @@ package com.moment.gallery;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -20,8 +19,7 @@ public class FileActivity extends AppCompatActivity {
     private GridView mGvImages;
 
     private ArrayList<String> images = new ArrayList<>();
-    private String folderUri;
-    private String fileUri;
+    private String folderName;
     ImagesInFileAdapter imagesInFileAdapter;
 
 
@@ -33,23 +31,20 @@ public class FileActivity extends AppCompatActivity {
         mFileName = findViewById(R.id.file_name);
         mGvImages = findViewById(R.id.gv_images);
 
-        mFileName.setText(reName(getIntent().getStringExtra("fileName")));
-        images = getIntent().getStringArrayListExtra("images");
-        folderUri = getIntent().getStringExtra("folderUri");
+        folderName = getIntent().getStringExtra("folderName");
+        mFileName.setText(folderName);
 
-        Log.d("FileActivity", images.toString());
-        Log.d("FileActivity", folderUri.toString());
 
-        imagesInFileAdapter = new ImagesInFileAdapter(this, images, folderUri);
+
+        imagesInFileAdapter = new ImagesInFileAdapter(this, folderName);
         mGvImages.setAdapter(imagesInFileAdapter);
 
         mGvImages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(FileActivity.this, SingleImageActivity.class);
-                intent.putStringArrayListExtra("images", images);
-                intent.putExtra("singleImage", images.get(position));
-                intent.putExtra("folderUri", folderUri);
+                intent.putExtra("folderName", folderName);
+                intent.putExtra("position", position);
                 startActivity(intent);
             }
         });

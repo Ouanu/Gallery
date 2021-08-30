@@ -1,8 +1,10 @@
 package com.moment.gallery.base;
 
+import android.content.ContentUris;
 import android.content.Context;
 
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,24 +14,34 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.bumptech.glide.Glide;
 import com.moment.gallery.R;
+import com.moment.gallery.common.GalleryHelper;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ImagesInFileAdapter extends BaseAdapter {
     private Context mContext;
-    private ArrayList<String> images = new ArrayList<>();
-    private String path;
 
-    public ImagesInFileAdapter(Context mContext, ArrayList<String> images, String path) {
+    private String folderName;
+
+    private GalleryHelper galleryHelper;
+
+    private List<GalleryHelper.Image> imageNameList;
+
+
+    public ImagesInFileAdapter(Context mContext, String folderName) {
         this.mContext = mContext;
-        this.images = images;
-        this.path = path;
+        this.folderName = folderName;
+        galleryHelper = GalleryHelper.getInstance(mContext);
+        imageNameList = galleryHelper.getImageInFolder(folderName);
     }
+
+
 
     @Override
     public int getCount() {
-        return images.size();
+        return imageNameList.size();
     }
 
     @Override
@@ -45,7 +57,6 @@ public class ImagesInFileAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        Log.d("IFAdapter", String.valueOf(images.size()));
         if (convertView == null) {
             viewHolder = new ViewHolder();
             convertView = View.inflate(mContext, R.layout.images_in_file_item, null);
@@ -56,7 +67,8 @@ public class ImagesInFileAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        Glide.with(convertView).load(path + "/" + images.get(position)).into(viewHolder.imageView);
+//        Glide.with(convertView).load(path + "/" + images.get(position)).into(viewHolder.imageView);
+        Glide.with(convertView).load(imageNameList.get(position).getImageNameId()).into(viewHolder.imageView);
         return convertView;
     }
 

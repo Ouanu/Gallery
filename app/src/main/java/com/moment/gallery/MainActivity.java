@@ -25,16 +25,13 @@ import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 
 import com.moment.gallery.base.ImageAdapter;
-import com.moment.gallery.common.DataHelper;
 import com.moment.gallery.common.GalleryHelper;
 
-import com.moment.gallery.common.ImageHelper;
+
 
 import java.util.ArrayList;
 
 import java.util.List;
-
-import static android.os.Environment.getExternalStorageDirectory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,21 +44,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private TextView progress_circular;
     private ListView mLvItems;
-    private List<String> imageUrls;
-    private List<String> folderNames;
     private List<Integer> counts;
-    private String mMd5;
-    private final String fileUrl = getExternalStorageDirectory().getAbsolutePath() + "/DCIM";
 
-    private boolean isChecked = false;
-    private AlertDialog alertDialog;
     private String delFileName;
 
     private List<GalleryHelper.ImageFile> images = new ArrayList<>();
 
-    ImageHelper imageHelper;
-
-    DataHelper dataHelper;
 
     GalleryHelper galleryHelper;
 
@@ -80,20 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: " + MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-        /**
-         * 检查本地是否有上次打开存储的记录
-         * 若有，则直接构建；否或无图片资源，则等待；
-         */
-        SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-        if (sharedPreferences.getInt("Nums", 0) != 0) {
-            dataHelper = new DataHelper(imageUrls, folderNames, counts, MainActivity.this);
-            folderNames = dataHelper.getFolderNames();
-            imageUrls = dataHelper.getImageUrls();
-            counts = dataHelper.getCounts();
-            mMd5 = dataHelper.getMd5();
-            initAdapter();
-
-        }
+//        Log.d(TAG, "------------- " + galleryHelper.getCountBucketNames().keySet());
 
         /**
          * 点击列表的元素，携带该文件夹所有的图片、文件名进到下一个页面
@@ -101,20 +76,18 @@ public class MainActivity extends AppCompatActivity {
         mLvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String Path = fileUrl + "/" + folderNames.get(position);
-                ArrayList<String> images = (ArrayList<String>) imageHelper.getImageNames(Path);
+                String folderName = images.get(position).getFileName();
+
                 Intent intent = new Intent(MainActivity.this, FileActivity.class);
-                intent.putStringArrayListExtra("images", images);
-                intent.putExtra("folderUri", fileUrl + "/" + folderNames.get(position));
-                intent.putExtra("fileName", folderNames.get(position));
+
+                intent.putExtra("folderName", folderName);
                 startActivityForResult(intent, REQUEST_FILE);
-//                startActivity(intent);
             }
         });
         mLvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-//                showListDialog(position);
+                showListDialog(position);
                 return true;
             }
         });
@@ -128,10 +101,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private void showListDialog(int position) {
         final String listItems[] = new String[]{"删除"};
-
         AlertDialog.Builder listDialog = new AlertDialog.Builder(this);
         listDialog.setTitle("test");
-        listDialog.setIcon(R.mipmap.ic_launcher_round);
+        listDialog.setIcon(R.drawable.baseline_warning_black_24dp);
 
     /*
         设置item 不能用setMessage()
@@ -139,23 +111,15 @@ public class MainActivity extends AppCompatActivity {
         items : listItems[] -> 列表项数组
         listener -> 回调接口
     */
-        listDialog.setItems(listItems, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MainActivity.this, listItems[which], Toast.LENGTH_SHORT).show();
-                handler.sendEmptyMessage(DELETE_FILE);
-                delFileName = fileUrl + "/" + folderNames.get(position);
-            }
+        listDialog.setItems(listItems, (dialog, which) -> {
+            Toast.makeText(MainActivity.this, listItems[which], Toast.LENGTH_SHORT).show();
+            handler.sendEmptyMessage(DELETE_FILE);
+            delFileName = images.get(position).getFileName();
         });
 
         //设置按钮
         listDialog.setPositiveButton("确定"
-                , new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                , (dialog, which) -> dialog.dismiss());
 
         listDialog.create().show();
     }
@@ -203,26 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 galleryHelper.getImageInFileList();
                 images = galleryHelper.getImageFileList();
                 counts = galleryHelper.getCountList();
-                Log.d(TAG, "run: " + images);
-                Log.d(TAG, "run: " + counts);
-                Log.d(TAG, "run: " + images.get(3).getFileName());
-                Log.d(TAG, "run: " + images.get(3).getUri());
                 handler.sendEmptyMessage(PIC_FOR_READY);
-//                folderNames = imageHelper.getFolderNames();
-//                folderNames = imageHelper.getScanFolder();
-//                imageUrls = imageHelper.getThumbNail();
-//                counts = imageHelper.getCount();
-//                String md5 = Utils.md5(counts.toString());
-//                if (folderNames.size() <= 0) {
-//                    handler.sendEmptyMessage(NONE_PIC);
-//                } else {
-//                    if (!md5.equals(mMd5)) {
-//                        handler.sendEmptyMessage(PIC_FOR_READY);
-//                    }
-//                }
-//                Log.d("yeor", "run: "+ (counts.retainAll(dataHelper.getCounts())));
-//                dataHelper = new DataHelper(imageUrls, folderNames, counts, MainActivity.this);
-//                dataHelper.WriteSharedPreferences();
             }
         }).start();
     }
@@ -247,9 +192,6 @@ public class MainActivity extends AppCompatActivity {
                 case DELETE_FILE:
                     Log.d("Handler", "handleMessage: delete");
                     Log.d("Handler", delFileName);
-//                    imageHelper.delFile(delFileName);
-//                    imageThread();
-
                     break;
             }
         }
@@ -257,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initAdapter() {
-//        ImageAdapter imageAdapter = new ImageAdapter(this, imageUrls, folderNames, counts);
         ImageAdapter imageAdapter = new ImageAdapter(this, images, counts);
         mLvItems.setAdapter(imageAdapter);
         progress_circular.setVisibility(View.GONE);

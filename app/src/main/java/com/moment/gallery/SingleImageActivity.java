@@ -2,7 +2,6 @@ package com.moment.gallery;
 
 import android.graphics.Matrix;
 import android.graphics.PointF;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,29 +9,25 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import com.bumptech.glide.Glide;
+import com.moment.gallery.common.GalleryHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SingleImageActivity extends AppCompatActivity {
     private static final int TITLE_BAR = 1;
-    private static final String TAG = "SingleImage";
     private static final int SHOW_BAR = 2;
     private static final int HIDE_BAR = 3;
-    private ArrayList<String> images = new ArrayList<>();
-    private String folderUri;
-    private String singleImage;
-    private int isMode = 0;
 
     private ImageView mIvSingleImage;
     private TextView mTvTitle;
 
     private static boolean isShow = true;
-    private RelativeLayout mRlSingleImage;
 
     private static final int SINGLE = 1;
     private static final int DOUBLE = 2;
@@ -61,17 +56,21 @@ public class SingleImageActivity extends AppCompatActivity {
 
         mIvSingleImage = findViewById(R.id.iv_singleImage);
         mTvTitle = findViewById(R.id.tv_title);
-        mRlSingleImage = findViewById(R.id.rl_singleImage);
 
-//        images = getIntent().getStringArrayListExtra("images");
-        singleImage = getIntent().getStringExtra("singleImage");
-        folderUri = getIntent().getStringExtra("folderUri");
-        Log.d("SingleImageActivity", singleImage.toString());
-        Log.d("SingleImageActivity", folderUri.toString());
+        String folderName;
+        int position;
+        folderName = getIntent().getStringExtra("folderName");
+        position = getIntent().getIntExtra("position", 0);
+
+        GalleryHelper galleryHelper = GalleryHelper.getInstance(this);
+        List<GalleryHelper.Image> imageList = new ArrayList<>();
+        imageList = galleryHelper.getImageInFolder(folderName);
+
 
         mIvSingleImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        mIvSingleImage.setImageURI(Uri.parse(folderUri + "/" + singleImage));
-        mTvTitle.setText(singleImage);
+//        mIvSingleImage.setImageURI(imageList.get(position).getImageNameId());
+        Glide.with(this).load(imageList.get(position).getImageNameId()).into(mIvSingleImage);
+        mTvTitle.setText(imageList.get(position).getImageName());
 
         handler.sendEmptyMessageDelayed(TITLE_BAR, 5000);
 

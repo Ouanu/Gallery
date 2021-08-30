@@ -1,8 +1,6 @@
 package com.moment.gallery.base;
 
 import android.content.Context;
-import android.net.Uri;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -11,11 +9,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.moment.gallery.R;
 import com.moment.gallery.common.GalleryHelper;
-import com.moment.gallery.common.ImageHelper;
 
 import java.util.List;
-
-import static android.os.Environment.getExternalStorageDirectory;
 
 public class ImageAdapter extends BaseAdapter {
     private final Context mContext;
