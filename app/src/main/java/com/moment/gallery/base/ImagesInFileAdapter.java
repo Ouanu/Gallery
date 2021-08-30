@@ -3,9 +3,11 @@ package com.moment.gallery.base;
 import android.content.ContentUris;
 import android.content.Context;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -14,9 +16,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.bumptech.glide.Glide;
 import com.moment.gallery.R;
+import com.moment.gallery.Utils.Utils;
 import com.moment.gallery.common.GalleryHelper;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +40,6 @@ public class ImagesInFileAdapter extends BaseAdapter {
         galleryHelper = GalleryHelper.getInstance(mContext);
         imageNameList = galleryHelper.getImageInFolder(folderName);
     }
-
-
 
     @Override
     public int getCount() {
@@ -69,6 +71,7 @@ public class ImagesInFileAdapter extends BaseAdapter {
         }
 //        Glide.with(convertView).load(path + "/" + images.get(position)).into(viewHolder.imageView);
         Glide.with(convertView).load(imageNameList.get(position).getImageNameId()).into(viewHolder.imageView);
+
         return convertView;
     }
 

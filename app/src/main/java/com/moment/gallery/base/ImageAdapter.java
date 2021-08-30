@@ -1,6 +1,8 @@
 package com.moment.gallery.base;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.Size;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -8,8 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.moment.gallery.R;
+import com.moment.gallery.Utils.Utils;
 import com.moment.gallery.common.GalleryHelper;
 
+import java.io.IOException;
 import java.util.List;
 
 public class ImageAdapter extends BaseAdapter {
@@ -51,12 +55,8 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-//        viewHolder.textView.setText(getName(fileNames.get(position)) + "(" + counts.get(position) + ")");
         viewHolder.textView.setText(imagefolders.get(position).getFileName() + "(" + counts.get(position) + ")");
-//        Log.d("Adapter", "getView: "+imagefolders.get(position).getFileName() + "(" + counts.get(position) + ")");
-//        Glide.with(mContext).load(imageUris.get(position)).apply(ImageHelper.requestOptions()).into(viewHolder.imageView);
-        Glide.with(mContext).load(imagefolders.get(position).getUri()).into(viewHolder.imageView);
-
+        Glide.with(mContext).load(imagefolders.get(position).getUri()).apply(Utils.getCoverRequestOptions()).into(viewHolder.imageView);
 
         return convertView;
     }

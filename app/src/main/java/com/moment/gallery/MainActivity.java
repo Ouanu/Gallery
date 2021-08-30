@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 
 import android.content.*;
 
+import android.graphics.Bitmap;
 import android.os.*;
 
 import android.provider.MediaStore;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private String delFileName;
 
     private List<GalleryHelper.ImageFile> images = new ArrayList<>();
-
+    private List<Bitmap> thumbnailList;
 
     GalleryHelper galleryHelper;
 
@@ -64,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         mLvItems = findViewById(R.id.lv_items);
 
         checkPermission();
-
 
         Log.d(TAG, "onCreate: " + MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 

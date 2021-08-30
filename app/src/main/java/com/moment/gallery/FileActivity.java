@@ -2,6 +2,7 @@ package com.moment.gallery;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -10,16 +11,20 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.moment.gallery.base.ImagesInFileAdapter;
+import com.moment.gallery.common.GalleryHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FileActivity extends AppCompatActivity {
 
     private TextView mFileName;
     private GridView mGvImages;
 
-    private ArrayList<String> images = new ArrayList<>();
     private String folderName;
+
+    private List<Bitmap> thumbnailList;
+
     ImagesInFileAdapter imagesInFileAdapter;
 
 
@@ -33,7 +38,6 @@ public class FileActivity extends AppCompatActivity {
 
         folderName = getIntent().getStringExtra("folderName");
         mFileName.setText(folderName);
-
 
 
         imagesInFileAdapter = new ImagesInFileAdapter(this, folderName);

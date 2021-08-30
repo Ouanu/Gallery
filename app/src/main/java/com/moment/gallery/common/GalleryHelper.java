@@ -3,11 +3,14 @@ package com.moment.gallery.common;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.Size;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -207,4 +210,27 @@ public class GalleryHelper {
             return uri;
         }
     }
+
+    public List<Bitmap> thumbnail(String folderName) {
+        List<Image> imageList = getImageInFolder(folderName);
+        List<Bitmap> thumbnailList = new ArrayList<>();
+        int i=0;
+        for (GalleryHelper.Image image : imageList) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                Bitmap thumbnail = null;
+                try {
+                    thumbnail = context.getContentResolver().loadThumbnail(imageList.get(i).getImageNameId(),
+                            new Size(640, 840), null);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                thumbnailList.add(thumbnail);
+            }
+            i++;
+        }
+        return thumbnailList;
+    }
+
+
 }

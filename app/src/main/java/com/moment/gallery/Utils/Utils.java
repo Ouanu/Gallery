@@ -1,6 +1,11 @@
 package com.moment.gallery.Utils;
 
+import android.graphics.Bitmap;
 import android.text.TextUtils;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,4 +33,16 @@ public class Utils {
         }
         return "";
     }
+
+    public static RequestOptions getCoverRequestOptions() {
+        RoundedCorners roundedCorners = new RoundedCorners(20);//数字为圆角度数
+        RequestOptions coverRequestOptions = new RequestOptions()
+                .transforms(new CenterCrop(), roundedCorners)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)//不做磁盘缓存
+                .skipMemoryCache(true);//不做内存缓存
+        return coverRequestOptions;
+    }
+
+
+
 }
