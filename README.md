@@ -1,21 +1,29 @@
-# Gallery
-相册
+# Gallery（相册）
+模块：
 
-图片集成框架有Glide
+common:
 
-使用XXPermisson权限请求框架
+* DataHelper 保存前一次扫描文件的信息，以便下次快速打开
+* ImageHelper 扫描DCIM文件夹、获取文件夹及照片的路径和名称 
 
-优化加载速度
+（已知BUG：MIUI没法用，测试机型有小米8SE、一加7T）
 
-8.28待完成：
+utils：
 
-·DCIM全扫描；
+* 生成MD5的工具
 
-·优化加载速度；
+base：（适配器）
 
-·添加手势缩放等操作；
+* ImageAdapter 首页item的格式
 
-·图片详情信息；
+* SingleImageAdapter 次要页面及展示页面的格式
 
-·图片增删更新。
+Activity:
+
+* MainActivity首页
+
+* FileActivity 首页item所指向的页面
+
+* SingleImageActivity 次页item指向的单张图片展示
+
 
