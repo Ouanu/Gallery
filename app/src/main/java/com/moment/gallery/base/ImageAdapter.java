@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.moment.gallery.R;
@@ -72,4 +73,5 @@ public class ImageAdapter extends BaseAdapter {
 //        }
 //        return name;
 //    }
+
 }

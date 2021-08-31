@@ -29,7 +29,6 @@ import com.moment.gallery.base.ImageAdapter;
 import com.moment.gallery.common.GalleryHelper;
 
 
-
 import java.util.ArrayList;
 
 import java.util.List;
@@ -53,12 +52,14 @@ public class MainActivity extends AppCompatActivity {
     private List<Bitmap> thumbnailList;
 
     GalleryHelper galleryHelper;
+    ImageAdapter imageAdapter;
+
+    private int goFilePosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         XXPermissions.setScopedStorage(true);
 
         progress_circular = findViewById(R.id.progress_circular);
@@ -77,52 +78,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String folderName = images.get(position).getFileName();
-
                 Intent intent = new Intent(MainActivity.this, FileActivity.class);
-
                 intent.putExtra("folderName", folderName);
+                goFilePosition = position;
                 startActivityForResult(intent, REQUEST_FILE);
             }
         });
-        mLvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                showListDialog(position);
-                return true;
-            }
-        });
+//        mLvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                showListDialog(position);
+//                return true;
+//            }
+//        });
 
+        galleryHelper.getImageList();
+        galleryHelper.getImageInFileList();
+        images = galleryHelper.getImageFileList();
+        counts = galleryHelper.getCountList();
+        imageAdapter = new ImageAdapter(MainActivity.this, images, counts);
+        handler.sendEmptyMessage(PIC_FOR_READY);
     }
 
-    /**
-     * 长按事件控件
-     *
-     * @param position
-     */
-    private void showListDialog(int position) {
-        final String listItems[] = new String[]{"删除"};
-        AlertDialog.Builder listDialog = new AlertDialog.Builder(this);
-        listDialog.setTitle("test");
-        listDialog.setIcon(R.drawable.baseline_warning_black_24dp);
-
-    /*
-        设置item 不能用setMessage()
-        用setItems
-        items : listItems[] -> 列表项数组
-        listener -> 回调接口
-    */
-        listDialog.setItems(listItems, (dialog, which) -> {
-            Toast.makeText(MainActivity.this, listItems[which], Toast.LENGTH_SHORT).show();
-            handler.sendEmptyMessage(DELETE_FILE);
-            delFileName = images.get(position).getFileName();
-        });
-
-        //设置按钮
-        listDialog.setPositiveButton("确定"
-                , (dialog, which) -> dialog.dismiss());
-
-        listDialog.create().show();
-    }
 
     //检查权限
     private void checkPermission() {
@@ -136,7 +113,8 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "获取读写权限成功", Toast.LENGTH_SHORT).show();
 //                            imageHelper = new ImageHelper(fileUrl);
                             galleryHelper = GalleryHelper.getInstance(MainActivity.this);
-                            imageThread();
+
+//                            imageThread();
                         } else {
                             Toast.makeText(MainActivity.this, "获取部分权限成功，但部分权限未正常授予", Toast.LENGTH_SHORT).show();
                         }
@@ -163,11 +141,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                galleryHelper.getImageList();
-                galleryHelper.getImageInFileList();
-                images = galleryHelper.getImageFileList();
-                counts = galleryHelper.getCountList();
-                handler.sendEmptyMessage(PIC_FOR_READY);
+
             }
         }).start();
     }
@@ -199,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initAdapter() {
-        ImageAdapter imageAdapter = new ImageAdapter(this, images, counts);
+
         mLvItems.setAdapter(imageAdapter);
         progress_circular.setVisibility(View.GONE);
     }
@@ -208,7 +182,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_FILE) {
             Log.d("onActivityResult", "onActivityResult: 1000");
+            int countDeleteImages = getIntent().getIntExtra("countDeleteImages", 0);
+            Log.d("-----------------", "onActivityResult:-------------- " + countDeleteImages);
+            if (countDeleteImages > 0) {
+                int cnt = counts.get(goFilePosition).intValue() - countDeleteImages;
+                Log.d("-----cnt---", "onActivityResult:-------------- " + cnt);
+                if (cnt > 0) {
+                    counts.set(goFilePosition, cnt);
+                } else {
+                    counts.remove(goFilePosition);
+                    images.remove(goFilePosition);
+                    handler.sendEmptyMessage(PIC_FOR_READY);
+                    Log.d("-----------------", "onActivityResult:-------------- finished");
+                }
+            }
+            imageAdapter.notifyDataSetChanged();
         }
+
         super.onActivityResult(requestCode, resultCode, data);
     }
+
 }

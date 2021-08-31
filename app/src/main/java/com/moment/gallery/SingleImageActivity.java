@@ -1,5 +1,6 @@
 package com.moment.gallery;
 
+import android.app.Activity;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.os.Bundle;

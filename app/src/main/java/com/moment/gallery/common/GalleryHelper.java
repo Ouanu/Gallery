@@ -1,5 +1,6 @@
 package com.moment.gallery.common;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -147,6 +148,30 @@ public class GalleryHelper {
         return images;
     }
 
+    /**
+     * 移除指定图片
+     * @param uri
+     * @return
+     */
+    public boolean deleteImage(Uri uri) {
+        // URI of the image to remove.
+        // WHERE clause.
+        String selection = null;
+        String[] selectionArgs = null;
+
+        // Perform the actual removal.
+        int numImagesRemoved = context.getContentResolver().delete(
+                uri,
+                selection,
+                selectionArgs);
+        if (numImagesRemoved > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
 
     public class Image {
 
@@ -214,7 +239,7 @@ public class GalleryHelper {
     public List<Bitmap> thumbnail(String folderName) {
         List<Image> imageList = getImageInFolder(folderName);
         List<Bitmap> thumbnailList = new ArrayList<>();
-        int i=0;
+        int i = 0;
         for (GalleryHelper.Image image : imageList) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
                 Bitmap thumbnail = null;

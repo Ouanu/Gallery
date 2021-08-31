@@ -27,18 +27,12 @@ import java.util.List;
 public class ImagesInFileAdapter extends BaseAdapter {
     private Context mContext;
 
-    private String folderName;
-
-    private GalleryHelper galleryHelper;
-
     private List<GalleryHelper.Image> imageNameList;
 
 
-    public ImagesInFileAdapter(Context mContext, String folderName) {
+    public ImagesInFileAdapter(Context mContext, List<GalleryHelper.Image> imageNameList) {
         this.mContext = mContext;
-        this.folderName = folderName;
-        galleryHelper = GalleryHelper.getInstance(mContext);
-        imageNameList = galleryHelper.getImageInFolder(folderName);
+        this.imageNameList = imageNameList;
     }
 
     @Override
