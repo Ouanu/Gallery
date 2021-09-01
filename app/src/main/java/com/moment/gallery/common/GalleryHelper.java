@@ -106,9 +106,6 @@ public class GalleryHelper {
                     countBucketNames.put(image.bucketName, (cnt == null) ? 1 : cnt + 1);
                 }
             }
-
-            Log.d(TAG, "------------- " + countBucketNames.keySet());
-            Log.d(TAG, "------------- " + countBucketNames.values());
         }
     }
 
@@ -153,6 +150,7 @@ public class GalleryHelper {
         }
         return images;
     }
+
 
     /**
      * 移除指定图片
@@ -226,6 +224,7 @@ public class GalleryHelper {
         public String getDateModified() {
             return dateModified;
         }
+
 
     }
 

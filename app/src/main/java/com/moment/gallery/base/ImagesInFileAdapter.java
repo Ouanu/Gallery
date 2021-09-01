@@ -1,13 +1,9 @@
 package com.moment.gallery.base;
 
-import android.content.ContentUris;
+
 import android.content.Context;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.util.Size;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -16,15 +12,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.bumptech.glide.Glide;
 import com.moment.gallery.R;
-import com.moment.gallery.Utils.Utils;
+
 import com.moment.gallery.common.GalleryHelper;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import static androidx.constraintlayout.widget.Constraints.TAG;
+
 
 public class ImagesInFileAdapter extends BaseAdapter {
     private Context mContext;

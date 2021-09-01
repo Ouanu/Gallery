@@ -1,6 +1,8 @@
 package com.moment.gallery;
 
 import android.content.*;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.*;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -17,6 +19,7 @@ import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 import com.moment.gallery.base.ImageAdapter;
 import com.moment.gallery.common.GalleryHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView progress_circular;
     private ListView mLvItems;
     private List<Integer> counts;
-
 
 
     private List<GalleryHelper.ImageFile> images = new ArrayList<>();
@@ -68,7 +70,9 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, FileActivity.class);
                 intent.putExtra("folderName", folderName);
                 goFilePosition = position;
+                Log.d(TAG, "onItemClick: " + images.get(position));
                 startActivityForResult(intent, REQUEST_FILE);
+
             }
         });
 //        mLvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -156,15 +160,16 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initAdapter() {
-
+        imageAdapter.notifyDataSetChanged();
         mLvItems.setAdapter(imageAdapter);
         progress_circular.setVisibility(View.GONE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_FILE ) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_FILE) {
             int countDeleteImages = data.getIntExtra("countDeleteImages", 0);
+            Log.d(TAG, "onActivityResult: " + countDeleteImages);
             if (countDeleteImages > 0) {
                 int cnt = counts.get(goFilePosition).intValue() - countDeleteImages;
                 if (cnt > 0) {
@@ -173,12 +178,13 @@ public class MainActivity extends AppCompatActivity {
                     counts.remove(goFilePosition);
                     images.remove(goFilePosition);
                     handler.sendEmptyMessage(PIC_FOR_READY);
+
+
                 }
 
             }
             imageAdapter.notifyDataSetChanged();
         }
-
         super.onActivityResult(requestCode, resultCode, data);
     }
 

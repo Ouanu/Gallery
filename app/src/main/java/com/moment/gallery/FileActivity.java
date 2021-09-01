@@ -2,8 +2,14 @@ package com.moment.gallery;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -12,8 +18,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.moment.gallery.base.ImagesInFileAdapter;
 import com.moment.gallery.common.GalleryHelper;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.moment.gallery.Utils.Utils.getRealPathFromURI;
 
 public class FileActivity extends AppCompatActivity {
 
@@ -87,13 +97,26 @@ public class FileActivity extends AppCompatActivity {
     */
         listDialog.setItems(listItems, (dialog, which) -> {
             Toast.makeText(FileActivity.this, listItems[which], Toast.LENGTH_SHORT).show();
+            //删除图片的索引（其他应用还可以搜到）
             boolean checkDelete = galleryHelper.deleteImage(imageList.get(position).getImageNameId());
 //            this.getContentResolver().delete(imageList.get(position).getImageNameId(), null, null);
             Toast.makeText(FileActivity.this, "result: " + checkDelete, Toast.LENGTH_SHORT).show();
             imageList.remove(position);
             countDeleteImages++;
             imagesInFileAdapter.notifyDataSetChanged();
+            //删除图片“文件”
+            String path = getRealPathFromURI(this, imageList.get(position).getImageNameId());
+            File file = new File(path);
+            if (file.exists()) {
+                Log.d("TAG", "showListDialog: yfhjdksahfjdhsajkfhjkdshajfhjdakshfjkdshajkfh");
+                file.delete();
+            } else {
+                Log.d("TAG", "showListDialog: NONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+            }
+            notifyLocalMedia(imageList.get(position).getImageNameId());
+            updateGallery(imageList.get(position).getImageName());
             mGvImages.setAdapter(imagesInFileAdapter);
+
 //            Log.d("imagesInFileAdapter", "showListDialog: " + imagesInFileAdapter.toString());
         });
 
@@ -106,15 +129,32 @@ public class FileActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
         Intent intent = new Intent();
         intent.putExtra("countDeleteImages", countDeleteImages);
         FileActivity.this.setResult(RESULT_OK, intent);
         Log.d("-----------", "onBackPressed: ______" + countDeleteImages);
-        FileActivity.this.finish();
-
-
+        finish();
     }
+
+    //通知MediaStore刷新删除的文件
+    private void notifyLocalMedia(Uri imgPath) {
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(imgPath);
+        this.sendBroadcast(intent);
+    }
+    // 通知MediaStore刷新新的文件
+    private void updateGallery(String filename)//filename是我们的文件全名，包括后缀哦
+    {
+        MediaScannerConnection.scanFile(this,
+                new String[] { filename }, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    @Override
+                    public void onScanCompleted(String path, Uri uri) {
+
+                    }
+                });
+    }
+
 
 
 }
