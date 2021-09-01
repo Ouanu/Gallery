@@ -21,7 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".FileActivity"/>
+        <activity android:name=".FileActivity"
+                android:launchMode="standard"/>
         <activity
                 android:name=".SingleImageActivity"
                 android:theme="@style/Theme.Gallery.SingleImage"/>

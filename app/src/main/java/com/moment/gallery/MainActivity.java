@@ -180,9 +180,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_FILE) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_FILE ) {
             Log.d("onActivityResult", "onActivityResult: 1000");
-            int countDeleteImages = getIntent().getIntExtra("countDeleteImages", 0);
+            int countDeleteImages = data.getIntExtra("countDeleteImages", 0);
             Log.d("-----------------", "onActivityResult:-------------- " + countDeleteImages);
             if (countDeleteImages > 0) {
                 int cnt = counts.get(goFilePosition).intValue() - countDeleteImages;

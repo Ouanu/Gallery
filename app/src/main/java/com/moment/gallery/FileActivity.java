@@ -116,11 +116,12 @@ public class FileActivity extends AppCompatActivity {
     public void onBackPressed() {
 
         Intent intent = new Intent();
-        intent.putExtra("countDeleteImages", 1);
-        setResult(RESULT_OK);
+        intent.putExtra("countDeleteImages", countDeleteImages);
+        FileActivity.this.setResult(RESULT_OK, intent);
         Log.d("-----------", "onBackPressed: ______" + countDeleteImages);
 //        setResult(Activity.RESULT_OK);
-        super.onBackPressed();
+//        super.onBackPressed();
+        FileActivity.this.finish();
 
 
     }
