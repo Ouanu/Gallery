@@ -28,9 +28,12 @@ Activity:
 * SingleImageActivity 次页item指向的单张图片展示
 
 
+# Author
+* Ouanu
+
 # Usage
 
-GalleryHelper 使用方法：
+* GalleryHelper 使用方法：
 
 `````/
 GalleryHelper galleryHelper = GalleryHelper.getInstance(MainActivity.this);
@@ -62,21 +65,16 @@ private Handler handler = new Handler() {
                 case PIC_FOR_UPDATE:
                     initAdapter();
                     break;
-                case DELETE_FILE:
-                    Log.d("Handler", "handleMessage: delete");
-                    Log.d("Handler", delFileName);
-                    break;
             }
         }
     };
     
 private void initAdapter() {
-        ImageAdapter imageAdapter = new ImageAdapter(this, images, counts);
+        imageAdapter.notifyDataSetChanged();
         mLvItems.setAdapter(imageAdapter);
         progress_circular.setVisibility(View.GONE);
     }
-    
-    
+
  /**
      * 获得共享存储的所有图片
      */
@@ -166,4 +164,28 @@ private void initAdapter() {
             }
         }
         return images;
+    }
+    
+    
+    
+    /**
+     * 将URI路径转化为path路径
+     */
+    public static String getRealPathFromURI(Context context, Uri contentURI) {
+        String result;
+        Cursor cursor = null;
+        try {
+            cursor = context.getContentResolver().query(contentURI, null, null, null, null);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        if (cursor == null) {
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
     }
