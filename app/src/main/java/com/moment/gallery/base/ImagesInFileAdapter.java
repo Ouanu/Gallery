@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static androidx.constraintlayout.widget.Constraints.TAG;
+
 public class ImagesInFileAdapter extends BaseAdapter {
     private Context mContext;
 
@@ -58,12 +60,10 @@ public class ImagesInFileAdapter extends BaseAdapter {
             convertView = View.inflate(mContext, R.layout.images_in_file_item, null);
             viewHolder.imageView = convertView.findViewById(R.id.iv_image);
             viewHolder.linearLayout = convertView.findViewById(R.id.ll_item);
-//            viewHolder.imageView.setImageURI(Uri.parse(path + "/" + images.get(position)));
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-//        Glide.with(convertView).load(path + "/" + images.get(position)).into(viewHolder.imageView);
         Glide.with(convertView).load(imageNameList.get(position).getImageNameId()).into(viewHolder.imageView);
 
         return convertView;
@@ -73,4 +73,6 @@ public class ImagesInFileAdapter extends BaseAdapter {
         ImageView imageView;
         LinearLayout linearLayout;
     }
+
+
 }

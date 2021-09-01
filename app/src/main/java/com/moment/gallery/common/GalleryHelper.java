@@ -1,16 +1,22 @@
 package com.moment.gallery.common;
 
+import android.app.RecoverableSecurityException;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.IntentSender;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -158,7 +164,10 @@ public class GalleryHelper {
         // WHERE clause.
         String selection = null;
         String[] selectionArgs = null;
-
+//        File file = new File(String.valueOf(uri));
+//        if (file.exists()) {
+//            file.delete();
+//        }
         // Perform the actual removal.
         int numImagesRemoved = context.getContentResolver().delete(
                 uri,
@@ -169,6 +178,8 @@ public class GalleryHelper {
         } else {
             return false;
         }
+
+
     }
 
 

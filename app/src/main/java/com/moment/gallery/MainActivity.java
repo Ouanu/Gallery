@@ -1,36 +1,23 @@
 package com.moment.gallery;
 
-import android.app.AlertDialog;
-
 import android.content.*;
-
-import android.graphics.Bitmap;
 import android.os.*;
-
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-
 import android.widget.AdapterView;
 import android.widget.ListView;
-
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
-
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
-
 import com.moment.gallery.base.ImageAdapter;
 import com.moment.gallery.common.GalleryHelper;
-
-
 import java.util.ArrayList;
-
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,10 +33,10 @@ public class MainActivity extends AppCompatActivity {
     private ListView mLvItems;
     private List<Integer> counts;
 
-    private String delFileName;
+
 
     private List<GalleryHelper.ImageFile> images = new ArrayList<>();
-    private List<Bitmap> thumbnailList;
+
 
     GalleryHelper galleryHelper;
     ImageAdapter imageAdapter;
@@ -92,12 +79,7 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        galleryHelper.getImageList();
-        galleryHelper.getImageInFileList();
-        images = galleryHelper.getImageFileList();
-        counts = galleryHelper.getCountList();
-        imageAdapter = new ImageAdapter(MainActivity.this, images, counts);
-        handler.sendEmptyMessage(PIC_FOR_READY);
+
     }
 
 
@@ -106,15 +88,15 @@ public class MainActivity extends AppCompatActivity {
         XXPermissions.with(this)
                 .permission(Permission.READ_EXTERNAL_STORAGE)
                 .permission(Permission.WRITE_EXTERNAL_STORAGE)
+//                .permission(Permission.MANAGE_EXTERNAL_STORAGE)
                 .request(new OnPermissionCallback() {
                     @Override
                     public void onGranted(List<String> permissions, boolean all) {
                         if (all) {
                             Toast.makeText(MainActivity.this, "获取读写权限成功", Toast.LENGTH_SHORT).show();
-//                            imageHelper = new ImageHelper(fileUrl);
                             galleryHelper = GalleryHelper.getInstance(MainActivity.this);
 
-//                            imageThread();
+                            imageThread();
                         } else {
                             Toast.makeText(MainActivity.this, "获取部分权限成功，但部分权限未正常授予", Toast.LENGTH_SHORT).show();
                         }
@@ -141,7 +123,12 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-
+                galleryHelper.getImageList();
+                galleryHelper.getImageInFileList();
+                images = galleryHelper.getImageFileList();
+                counts = galleryHelper.getCountList();
+                imageAdapter = new ImageAdapter(MainActivity.this, images, counts);
+                handler.sendEmptyMessage(PIC_FOR_READY);
             }
         }).start();
     }
@@ -163,10 +150,6 @@ public class MainActivity extends AppCompatActivity {
                 case PIC_FOR_UPDATE:
                     initAdapter();
                     break;
-                case DELETE_FILE:
-                    Log.d("Handler", "handleMessage: delete");
-                    Log.d("Handler", delFileName);
-                    break;
             }
         }
     };
@@ -181,20 +164,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_FILE ) {
-            Log.d("onActivityResult", "onActivityResult: 1000");
             int countDeleteImages = data.getIntExtra("countDeleteImages", 0);
-            Log.d("-----------------", "onActivityResult:-------------- " + countDeleteImages);
             if (countDeleteImages > 0) {
                 int cnt = counts.get(goFilePosition).intValue() - countDeleteImages;
-                Log.d("-----cnt---", "onActivityResult:-------------- " + cnt);
                 if (cnt > 0) {
                     counts.set(goFilePosition, cnt);
                 } else {
                     counts.remove(goFilePosition);
                     images.remove(goFilePosition);
                     handler.sendEmptyMessage(PIC_FOR_READY);
-                    Log.d("-----------------", "onActivityResult:-------------- finished");
                 }
+
             }
             imageAdapter.notifyDataSetChanged();
         }

@@ -1,13 +1,10 @@
 package com.moment.gallery;
 
-import android.app.Activity;
+
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.moment.gallery.base.ImagesInFileAdapter;
 import com.moment.gallery.common.GalleryHelper;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +30,7 @@ public class FileActivity extends AppCompatActivity {
 
     private int countDeleteImages = 0;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,9 +42,12 @@ public class FileActivity extends AppCompatActivity {
         folderName = getIntent().getStringExtra("folderName");
         mFileName.setText(folderName);
 
+
         imageList = galleryHelper.getImageInFolder(folderName);
 
+
         imagesInFileAdapter = new ImagesInFileAdapter(this, imageList);
+
         mGvImages.setAdapter(imagesInFileAdapter);
 
 
@@ -55,16 +55,14 @@ public class FileActivity extends AppCompatActivity {
             Intent intent = new Intent(FileActivity.this, SingleImageActivity.class);
             intent.putExtra("folderName", folderName);
             intent.putExtra("position", position);
+
             startActivityForResult(intent, REQUEST_IMAGE);
 
         });
 
-        mGvImages.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                showListDialog(position);
-                return true;
-            }
+        mGvImages.setOnItemLongClickListener((parent, view, position, id) -> {
+            showListDialog(position);
+            return true;
         });
 
 
@@ -73,10 +71,10 @@ public class FileActivity extends AppCompatActivity {
     /**
      * 长按事件控件
      *
-     * @param position
+     * @param position 获得图片位置
      */
     private void showListDialog(int position) {
-        final String listItems[] = new String[]{"删除"};
+        final String[] listItems = new String[]{"删除"};
         AlertDialog.Builder listDialog = new AlertDialog.Builder(this);
         listDialog.setTitle("test");
         listDialog.setIcon(R.drawable.baseline_warning_black_24dp);
@@ -89,28 +87,22 @@ public class FileActivity extends AppCompatActivity {
     */
         listDialog.setItems(listItems, (dialog, which) -> {
             Toast.makeText(FileActivity.this, listItems[which], Toast.LENGTH_SHORT).show();
-//            handler.sendEmptyMessage(DELETE_FILE);
-//            delFileName = images.get(position).getFileName();
             boolean checkDelete = galleryHelper.deleteImage(imageList.get(position).getImageNameId());
-            Toast.makeText(FileActivity.this, "result: " + String.valueOf(checkDelete), Toast.LENGTH_SHORT).show();
+//            this.getContentResolver().delete(imageList.get(position).getImageNameId(), null, null);
+            Toast.makeText(FileActivity.this, "result: " + checkDelete, Toast.LENGTH_SHORT).show();
             imageList.remove(position);
             countDeleteImages++;
             imagesInFileAdapter.notifyDataSetChanged();
+            mGvImages.setAdapter(imagesInFileAdapter);
+//            Log.d("imagesInFileAdapter", "showListDialog: " + imagesInFileAdapter.toString());
         });
 
         //设置按钮
         listDialog.setPositiveButton("确定"
                 , (dialog, which) -> dialog.dismiss());
-
         listDialog.create().show();
     }
 
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-    }
 
     @Override
     public void onBackPressed() {
@@ -119,22 +111,10 @@ public class FileActivity extends AppCompatActivity {
         intent.putExtra("countDeleteImages", countDeleteImages);
         FileActivity.this.setResult(RESULT_OK, intent);
         Log.d("-----------", "onBackPressed: ______" + countDeleteImages);
-//        setResult(Activity.RESULT_OK);
-//        super.onBackPressed();
         FileActivity.this.finish();
 
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
 
-    private String reName(String name) {
-        if (name.equals("")) {
-            return "DCIM";
-        }
-        return name;
-    }
 }

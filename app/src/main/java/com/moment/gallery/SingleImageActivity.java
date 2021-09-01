@@ -1,6 +1,6 @@
 package com.moment.gallery;
 
-import android.app.Activity;
+
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.os.Bundle;
@@ -14,10 +14,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import com.bumptech.glide.Glide;
+
 import com.moment.gallery.common.GalleryHelper;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 public class SingleImageActivity extends AppCompatActivity {
@@ -59,18 +59,20 @@ public class SingleImageActivity extends AppCompatActivity {
         mTvTitle = findViewById(R.id.tv_title);
 
         String folderName;
+        String imageUri;
         int position;
         folderName = getIntent().getStringExtra("folderName");
         position = getIntent().getIntExtra("position", 0);
+        imageUri = getIntent().getStringExtra("imageUri");
 
         GalleryHelper galleryHelper = GalleryHelper.getInstance(this);
-        List<GalleryHelper.Image> imageList = new ArrayList<>();
-        imageList = galleryHelper.getImageInFolder(folderName);
+        List<GalleryHelper.Image> imageList = galleryHelper.getImageInFolder(folderName);
 
 
         mIvSingleImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//        mIvSingleImage.setImageURI(imageList.get(position).getImageNameId());
-        Glide.with(this).load(imageList.get(position).getImageNameId()).into(mIvSingleImage);
+        mIvSingleImage.setImageURI(imageList.get(position).getImageNameId());
+        Log.d("SingleImage-------", "onCreate: " + imageList.get(position).getImageNameId());
+        Log.d("SingleImage-------", "onCreate: " + imageUri);
         mTvTitle.setText(imageList.get(position).getImageName());
 
         handler.sendEmptyMessageDelayed(TITLE_BAR, 5000);
