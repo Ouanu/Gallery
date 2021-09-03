@@ -75,117 +75,26 @@ private void initAdapter() {
         progress_circular.setVisibility(View.GONE);
     }
 
- /**
-     * 获得共享存储的所有图片
-     */
-    public void getImageList() {
-
-        try (Cursor cursor = context.getContentResolver().query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                selection,
-                null,
-                sortOrder
-        )) {
-            int name_id = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
-            int bucket_id = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID);
-            int name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
-            int bucket_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-            int size = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE);
-            int date = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED);
-
-            while (cursor.moveToNext()) {
-                long imageId = cursor.getLong(name_id);
-                long bucketId = cursor.getLong(bucket_id);
-                String imageName = cursor.getString(name);
-                String bucketName = cursor.getString(bucket_name);
-                int imageSize = cursor.getInt(size);
-                String dateModified = cursor.getString(date);
-
-                Uri contentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, imageId);
-                imageList.add(new Image(imageName, bucketName, contentUri, bucketId, imageSize, dateModified));
-            }
-
-            for (Image image : imageList) {
-                if (!"".equals(image.bucketName) && image.bucketName != null) {
-                    Integer cnt = countBucketNames.get(image.getBucketName());
-                    countBucketNames.put(image.bucketName, (cnt == null) ? 1 : cnt + 1);
-                }
-            }
-
-            Log.d(TAG, "------------- " + countBucketNames.keySet());
-            Log.d(TAG, "------------- " + countBucketNames.values());
-        }
-    }
-    
-    
-    /**
-     * ImageFileList --> 文件夹名称 + 图片Uri(首页）
-     */
-    public void getImageInFileList() {
-        List<Uri> imageId = new ArrayList<>();
-        List<String> imageName = new ArrayList<>();
-        int i = 0;
-        int cnt = 0;
-        for (String s : countBucketNames.keySet()) {
-            if (s != null && s.length() > 0) {
-                for (Image image : imageList) {
-                    if (s.equals(image.getBucketName())) {
-                        imageName.add(image.getImageName());
-                        imageId.add(image.getImageNameId());
-                        i++;
-                        cnt++;
-                    }
-                }
-            }
-
-            countList.add(cnt);
-            cnt = 0;
-            imageFileList.add(new ImageFile(s, imageId.get(i - 1)));
-
-        }
-    }
-    
-    public List<ImageFile> getImageFileList() {
-        return imageFileList;
-    }
     
 
     /**
      * 首页Item指向的文件夹里的所有图片(用于下一页）
      */
-    public List<Image> getImageInFolder(String folderName) {
-        List<Image> images = new ArrayList<>();
-        for (Image image : imageList) {
-            if (image != null) {
-                if (folderName.equals(image.bucketName)) {
-                    images.add(image);
-                }
-            }
-        }
-        return images;
-    }
-    
-    
-    
+     
+     List<Image> imageFolder = galleryHelper.getImageInFolder("folder name");
+     
+
     /**
      * 将URI路径转化为path路径
      */
-    public static String getRealPathFromURI(Context context, Uri contentURI) {
-        String result;
-        Cursor cursor = null;
-        try {
-            cursor = context.getContentResolver().query(contentURI, null, null, null, null);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        if (cursor == null) {
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
-    }
+     
+     String realPath = getRealPathFromURI(Context context, Uri contentURI);
+     
+     /**
+     * 移除指定图片
+     * @param uri
+     * @return
+     */
+    boolean deleteResult = galleryHelper.deleteImage(Uri uri);
+    
+  
