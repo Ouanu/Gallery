@@ -81,7 +81,7 @@ private void initAdapter() {
      * 首页Item指向的文件夹里的所有图片(用于下一页）
      */
      
-     List<Image> imageFolder = galleryHelper.getImageInFolder("folder name");
+     List<Image> imageFolder = galleryHelper.getImageInFolder(String folderName);
      
 
     /**
